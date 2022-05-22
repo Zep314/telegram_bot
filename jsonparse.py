@@ -1,8 +1,23 @@
+import json
+import message
 class JsonParse:
-    json = ''
+   
 
     def __init__(self,json_string):
-        json = json_string
+        self.json = json_string
     
-    def Parse():
-        return []
+    def Parse(self):
+        ret = []
+        if len(self.json['result'])>0:
+            for result in self.json['result']:
+                msg = message.TeleMessage
+                msg.user_id = result['message']['from']['id']
+                msg.first_name = result['message']['from']['first_name']
+                msg.message_text = result['message']['text']
+                msg.update_id = result['update_id']
+                msg.message_id = result['message']['message_id']
+                msg.chat_id = result['message']['chat']['id']
+                #message.TeleMessage.Print(msg)
+                ret.append(msg)
+
+        return ret

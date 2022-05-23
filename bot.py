@@ -2,8 +2,9 @@ import sys
 import requests
 import json
 from jsonparse import JsonParse
-from message import TeleMessage
+#from message import TeleMessage
 from settings import Settings
+from botIO import MyIO
 from time import sleep
 
 class GrigoryTestPythonBot:
@@ -13,6 +14,7 @@ class GrigoryTestPythonBot:
 
     def __init__(self):
         self.settings = Settings()
+        self.myIO = MyIO()
 
     def _send_message(self,chat_id,text,reply_to_message_id = 0):
         url = f"{self.settings.baseUrl}sendMessage?chat_id={chat_id}&text={text}"
@@ -34,19 +36,32 @@ class GrigoryTestPythonBot:
 #        self._send_message(418068635,"Ответ123")
 #        sys.exit()
 
+    def _help_action(self,msg):
+        help_msg =  'Привет! Я Telegram-бот ГРИША\n'+\
+                    ' Я умею показывать погоду по указанному Вами городу'
+        self._send_message(msg.chat_id,help_msg,msg.message_id)
+
+    def _start_action(self,msg):
+        msg_string =  'Тут надо написать функцию СТАРТ'
+        self._send_message(msg.chat_id,msg_string,msg.message_id)
+
     def run_bot(self):
         self.offset_msg = 0;
         print("Press Ctrl+C to exit")
         while True:
-            #self._check_events()
             self._getUpdates()
             if len(self.incoming_msgs) > 0:
-                print(len(self.incoming_msgs))
+
                 for msg in self.incoming_msgs:
-                    #message.TeleMessage.Print(msg)
-                    TeleMessage.Print(msg)
-                    self._send_message(msg.chat_id,msg.message_text,msg.message_id)
+                    match msg.message_text.lower():
+                        case '/help':
+                            self._help_action(msg)
+                        case '/start':
+                            self._start_action(msg)
+                        case _:
+                            self._send_message(msg.chat_id,'Не понимаю, чего Вы от меня хотите...',msg.message_id)
                 self.offset_msg = msg.update_id +1
-                print(msg.message_text)
+                #print(msg.message_text)
             sleep(1)
+
             #sys.exit()

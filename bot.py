@@ -45,6 +45,13 @@ class GrigoryTestPythonBot:
         msg_string =  'Тут надо написать функцию СТАРТ'
         self._send_message(msg.chat_id,msg_string,msg.message_id)
 
+    def _save(self,fmt,msg):
+        out = MyIO()
+
+        result = out.SaveLog(msg.user_id, msg.message_id, msg.chat_id,fmt)
+        if not result:
+            self._send_message(msg.chat_id,'Ошибка отправки файла',msg.message_id)
+
     def run_bot(self):
         self.offset_msg = 0;
         print("Press Ctrl+C to exit")
@@ -58,6 +65,12 @@ class GrigoryTestPythonBot:
                             self._help_action(msg)
                         case '/start':
                             self._start_action(msg)
+                        case '/savetxt':
+                            self._save('TXT',msg)
+                        case '/savejson':
+                            self._save('JSON',msg)
+                        case '/savexml':
+                            self._save('XML',msg)
                         case _:
                             self._send_message(msg.chat_id,'Не понимаю, чего Вы от меня хотите...',msg.message_id)
                 self.offset_msg = msg.update_id +1

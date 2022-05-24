@@ -1,4 +1,5 @@
 #import json
+from botIO import MyIO
 import message
 class JsonParse:
    
@@ -20,5 +21,7 @@ class JsonParse:
                     msg.message_id = result['message']['message_id']
                     msg.chat_id = result['message']['chat']['id']
                     #message.TeleMessage.Print(msg)
+                    out = MyIO()
+                    out.Append(msg.user_id,msg.message_text)
                     ret.append(msg)
         return ret

@@ -15,7 +15,7 @@ class MyIO:
             os.mkdir(self.settings.data_dir)
 
     def Append(self,user_id,message):
-        with open(f'{self.settings.data_dir}\{user_id}.db','a') as f:
+        with open(os.path.join(self.settings.data_dir,f'{user_id}.db'),mode = 'a', encoding="utf-8") as f:
             f.write(f"{datetime.now()};{message}\n")
 
     def _indent_xml(self,elem, level=0):
@@ -35,7 +35,8 @@ class MyIO:
 
     def SaveLog(self,user_id,message_id,chat_id,fmt):
 
-        with open(f'{self.settings.data_dir}\{user_id}.db','r') as f:
+
+        with open(os.path.join(self.settings.data_dir,f'{user_id}.db'), mode = 'r', encoding="utf-8") as f:
             if f:
                 match fmt:
                     case 'JSON':
@@ -45,11 +46,13 @@ class MyIO:
                             items = my_lines[i].split(";")
                             my_list.append({'DateTime': items[0], 'Message': items[1].replace('\n','')})
 
-                        file_json = f'{self.settings.data_dir}\{user_id}.json' 
-                        with open(file_json,'w') as w:
+#                        file_json = f'{self.settings.data_dir}\{user_id}.json' 
+                        file_json = os.path.join(self.settings.data_dir, f'{user_id}.json') 
+ 
+                        with open(file_json, mode = 'w', encoding="utf-8") as w:
                             w.write(json.dumps(my_list, indent=4))
                         
-                        with open(file_json,'r') as w:
+                        with open(file_json, mode = 'r', encoding="utf-8") as w:
                             post_data = {
                                 'chat_id': chat_id,
                                 'caption': 'Логи в JSON',
@@ -80,10 +83,10 @@ class MyIO:
                         self._indent_xml(root)
 
                         etree = ET.ElementTree(root)
-                        file_xml = f'{self.settings.data_dir}\{user_id}.xml'
-                        with open(file_xml,'w') as w:
+                        file_xml = os.path.join(self.settings.data_dir, f'{user_id}.xml')
+                        with open(file_xml, mode = 'w', encoding="utf-8") as w:
                             etree.write(file_xml, encoding='utf-8', xml_declaration=True)
-                        with open(file_xml,'r') as w:
+                        with open(file_xml, mode = 'r', encoding="utf-8") as w:
                             post_data = {
                                 'chat_id': chat_id,
                                 'caption': 'Логи в XML',

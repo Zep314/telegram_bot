@@ -47,7 +47,6 @@ class GrigoryTestPythonBot:
 
     def _save(self,fmt,msg):
         out = MyIO()
-
         result = out.SaveLog(msg.user_id, msg.message_id, msg.chat_id,fmt)
         if not result:
             self._send_message(msg.chat_id,'Ошибка отправки файла',msg.message_id)
@@ -72,9 +71,8 @@ class GrigoryTestPythonBot:
                         case '/savexml':
                             self._save('XML',msg)
                         case _:
-                            self._send_message(msg.chat_id,'Не понимаю, чего Вы от меня хотите...',msg.message_id)
+                            self._send_message(msg.chat_id,'Не понимаю, чего Вы от меня хотите...\n /help - для помощи',msg.message_id)
                 self.offset_msg = msg.update_id +1
-                #print(msg.message_text)
             sleep(1)
 
             #sys.exit()

@@ -1,19 +1,16 @@
-#import json
 from botIO import MyIO
 import message
-class JsonParse:
-   
 
+class JsonParse:
     def __init__(self,json_string):
         self.json = json_string
     
     def Parse(self):
         ret = []
-        if len(self.json['result'])>0:
+        if len(self.json['result']) > 0:
             for result in self.json['result']:
                 if 'message' in result:
-                    #print(result)
-                    msg = message.TeleMessage
+                    msg = message.TeleMessage()
                     msg.user_id = result['message']['from']['id']
                     msg.first_name = result['message']['from']['first_name']
                     msg.message_text = result['message']['text']

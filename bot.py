@@ -1,9 +1,9 @@
-from socket import ALG_SET_AEAD_ASSOCLEN, AddressFamily
 import sys
 import requests
 import json
 import signal
 import time
+import os
 from jsonparse import JsonParse
 #from message import TeleMessage
 from settings import Settings
@@ -21,8 +21,8 @@ class GrigoryTestPythonBot:
         self.users = {}
         self.offset_msg = 0
 
-    def _send_message(self,chat_id,text,reply_to_message_id = 0):
-        url = f"{self.settings.baseUrl}sendMessage?chat_id={chat_id}&text={text}"
+    def _send_message(self,chat_id,text,reply_to_message_id = 0, parse_mode = 'Markdown'):
+        url = f"{self.settings.baseUrl}sendMessage?chat_id={chat_id}&text={text}&parse_mode={parse_mode}"
         if reply_to_message_id: 
             url += f"&reply_to_message_id={reply_to_message_id}"
         requests.get(url)
@@ -39,7 +39,29 @@ class GrigoryTestPythonBot:
         aw = MyAccuWeather()
         self._send_message(msg.chat_id,
                            aw.GetWeather(msg.message_text.split(' ',maxsplit=1)[1]),
-                           msg.message_id)
+                           msg.message_id,parse_mode = 'Markdown')
+
+    def _cat(self,msg):
+        cat_gif = requests.get(self.settings.cats_api_url)
+        file_gif = os.path.join(self.settings.data_dir, 'random_cat.gif')
+
+        with open(file_gif, mode = 'wb') as g:
+            g.write(cat_gif.content)
+
+        with open(file_gif, mode = 'rb') as g:
+            post_data = {
+                        'chat_id': msg.chat_id,
+                        'caption': 'Котик',
+                        'reply_to_message_id': msg.message_id
+                        }
+            post_file = {
+                        'video': g
+                        }
+            self._send_message(msg.chat_id,'Ура! Вы нашли пасхалочку! )))))\n Вот Вам котик в карму!',msg.message_id)
+            requests.post(f'{self.settings.baseUrl}sendVideo', data = post_data, files = post_file)
+
+        if os.path.exists(file_gif):
+            os.remove(file_gif)
 
     def _help_action(self,msg):
         help_msg =  'Привет! Я Telegram-бот ГРИША\n'+\
@@ -88,6 +110,8 @@ class GrigoryTestPythonBot:
             return 'saveXML'
         elif command_str.lower().find('/forecast') == 0:
             return 'forecast'
+        elif command_str.lower().find('/cat') == 0:
+            return 'cat'
         else:
             return 'unknown'
 
@@ -115,6 +139,8 @@ class GrigoryTestPythonBot:
                                         self._save('XML',msg)
                                     case 'forecast':
                                         self._forecast(msg)
+                                    case 'cat':
+                                        self._cat(msg)
                                     case _:
                                         self._send_message(msg.chat_id,'Не понимаю, чего Вы от меня хотите...\n /help - для помощи',msg.message_id)
                             else:

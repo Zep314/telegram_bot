@@ -19,3 +19,10 @@
 s = '2022-05-26T07:00:00+03:00'
 
 print(f'{".".join(list( reversed(s.split("T")[0].split("-")) ))} {s.split("T")[1][:5]}')
+
+s = '0123456789'
+
+print(s)
+while len(s)>0:
+    print(s[:3])
+    s = s[3:]

@@ -1,3 +1,5 @@
+# Обработка запросов по прогнозу погоды
+
 import requests
 import json
 from settings import Settings
@@ -7,26 +9,27 @@ from accu_model import AccuWeatherForecast as AWF
 from accu_parse import AccuWeatherForecastJsonParse as AWFJP
 
 
+# Класс работы с прогнозом погоды
 class MyAccuWeather:
     def __init__(self):
         self.settings = Settings()
-        self.city = AWC()
-        self.forecast = AWF()
+        self.city = AWC()       # Создем объект - гопод
+        self.forecast = AWF()   #  Создаем объект - прогноз
     
-    def _get_city_key(self,city):
+    def _get_city_key(self,city): # Запросом пытаемся найти город, который указал пользователь
         url = self.settings.base_accuweather_url+'/locations/v1/cities/search'+\
                 f'?apikey={self.settings.accuweather_tocken}&language=ru-ru'+\
                 f'&q={city}'  
         response = requests.get(url)  
         data = json.loads(response.text)
         if len(data) > 0:
-            self.city = AWCJP.Parse(AWCJP(data))
+            self.city = AWCJP.Parse(AWCJP(data))  # "Грызем" запрос
             return self.city
         else:
             return -1
 
     def GetWeather(self,city):
-        city_key = self._get_city_key(city)
+        city_key = self._get_city_key(city) # Достаем из запроса ID города
         if city_key == -1:
             return f'Не могу найти город *{city}*. Попробуйте еще раз.'
         else:
@@ -39,7 +42,8 @@ class MyAccuWeather:
                 json.dump(data, outfile)
             
             if len(data) > 0:
-                self.forecast = AWFJP.Parse(AWFJP(data))
+                self.forecast = AWFJP.Parse(AWFJP(data))    # "Грызем" запрос по прогнозу
+                                                            #  Тут его красиво оформляем в MarkDown
                 ret_str=''+\
                         f'Прогноз погоды для города *{city_key.name}*:\n'+\
                         f'\t Прогноз актуален на {self.forecast.date_time}.\n'+\

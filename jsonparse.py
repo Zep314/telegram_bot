@@ -1,3 +1,4 @@
+# Методы для обработки JSON от telegram 
 from botIO import MyIO
 import message
 
@@ -17,8 +18,8 @@ class JsonParse:
                     msg.update_id = result['update_id']
                     msg.message_id = result['message']['message_id']
                     msg.chat_id = result['message']['chat']['id']
-                    #message.TeleMessage.Print(msg)
                     out = MyIO()
+                    # Пишем историю запросов
                     out.Append(msg.user_id,msg.message_text)
                     ret.append(msg)
         return ret
